@@ -122,13 +122,21 @@ function AudioRecorder(config) {
   }
 
   function setupStorage() {
+    
     Storage.ctx = new AudioContext();
-
+    
     if (Storage.ctx.createJavaScriptNode) {
+      alert(333)
+
       jsAudioNode = Storage.ctx.createJavaScriptNode(bufferSize, numberOfAudioChannels, numberOfAudioChannels);
     } else if (Storage.ctx.createScriptProcessor) {
+      alert(444)
+      console.log('====================================')
+      console.log(Storage.ctx)
+      console.log('====================================')
       jsAudioNode = Storage.ctx.createScriptProcessor(bufferSize, numberOfAudioChannels, numberOfAudioChannels);
     } else {
+      alert('WebAudio API has no support on this browser.')
       throw 'WebAudio API has no support on this browser.';
     }
 
@@ -136,6 +144,7 @@ function AudioRecorder(config) {
   }
 
   function onMicrophoneCaptured(microphone) {
+    alert(111)
     startButton.disabled = true;
     stopButton.disabled = false;
 
@@ -150,6 +159,7 @@ function AudioRecorder(config) {
   }
 
   function onMicrophoneCaptureError() {
+    alert('no support ')
     console.log("There was an error accessing the microphone. You may need to allow the browser access");
   }
 
