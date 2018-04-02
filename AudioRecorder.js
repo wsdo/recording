@@ -2,7 +2,23 @@ var Storage = {};
 console.log('====================================')
 console.log(navigator.mediaDevices)
 console.log('====================================')
+function audioContextCheck() {
+  if (typeof window.AudioContext !== "undefined") {
+    console.log('AudioContext');
+    return new window.AudioContext();
+  } else if (typeof webkitAudioContext !== "undefined") {
+    console.log('webkitAudioContext');
+    return new window.webkitAudioContext();
+  } else if (typeof window.mozAudioContext !== "undefined") {
+    console.log('mozAudioContext');
+    return new window.mozAudioContext();
+  } else {
+    console.log('NONE OF THEM!');
+  }
+}
 
+
+audioContextCheck();
 var context;
 window.addEventListener('load', init, false);
 function init() {
