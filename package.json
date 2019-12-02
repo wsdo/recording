@@ -1,21 +1,38 @@
 {
-  "name": "safari-audio-recording",
+  "name": "recorder",
   "version": "1.0.0",
-  "description": "A simple audio recorder which works in Safari 11",
-  "main": "AudioRecorder.js",
-  "dependencies": {},
-  "devDependencies": {
-    "browser-sync": "^2.18.13"
-  },
+  "description": "Html5 recording solution, mp3 format",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "build": "npm run build:lib && npm run build:browserify",
+    "build:lib": "babel src/ -d lib/",
+    "build:browserify": "browserify lib/index.js -t babelify --outfile dist/recorder.js -s Recorder",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://danstorey@bitbucket.org/danstorey/danstorey.bitbucket.io.git"
+    "url": "git+"
   },
-  "author": "Dan Storey <danielstorey@gmail.com>",
+  "author": "",
   "license": "MIT",
-  "homepage": "https://github.com/danielstorey/webrtc-audio-recording.git"
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "inline-worker": "^0.1.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.3.13",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "babelify": "^7.2.0",
+    "browserify": "^12.0.1"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0"
+    ]
+  }
 }
