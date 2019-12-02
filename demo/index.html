@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>stark</title>
+  <style type='text/css'>
+    ul { list-style: none; }
+    #recordingslist audio { display: block; margin-bottom: 10px; }
+  </style>
+
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/qiniu-js/1.0.17.1/qiniu.min.js"></script>
+  <script src="https://cdn.bootcss.com/plupload/2.1.1/moxie.js"></script>
+  <script src="https://cdn.bootcss.com/plupload/2.1.1/plupload.min.js"></script>
+</head>
+<body>
+
+  <h1>stark recorder</h1>
+
+  <button onclick="startRecording(this);">录制</button>
+  <button onclick="stopRecording(this);" disabled>停止</button>
+  
+  <h2>录音</h2>
+  <ul id="recordingslist"></ul>
+  
+  <h2>日志</h2>
+  <pre id="log"></pre>
+
+  <script>
+  function __log(e, data) {
+    log.innerHTML += "\n" + e + " " + (data || '');
+  }
+
+  var audio_context;
+  var recorder;
+
+  function startUserMedia(stream) {
+    var input = audio_context.createMediaStreamSource(stream);
+    __log('Media stream created.');
+
+    // 如果你想让音频直接反馈
+    //input.connect(audio_context.destination);
+    //__log('Input connected to audio context destination.');
+    var config = {
+      sampleRate: 16000,
+      sampleRate: 16000,
+      bitRate: 16,
+      mimeType: 'audio/mp3'
+    };
+
+    recorder = new Recorder(input,config);
+    __log('录音初始化');
+  }
+
+  function startRecording(button) {
+    recorder && recorder.record();
+    button.disabled = true;
+    button.nextElementSibling.disabled = false;
+    __log('正在开始录音...');
+  }
+
+  function stopRecording(button) {
+    recorder && recorder.stop();
+    button.disabled = true;
+    button.previousElementSibling.disabled = false;
+    __log('录音停止');
+    createDownloadLink();
+    
+    recorder && recorder.clear();
+  }
+
+  function createDownloadLink() {
+    recorder && recorder.exportAudio(function(blob) {
+      var url = URL.createObjectURL(blob);
+      // 使用ajax
+      // $.ajax({
+      //   url:'http://localhost:8000/v1/file/upload-file',
+      //   type:'post',
+      //   data:{file:url},
+      //   success: function (data) {
+      //     console.log(data);
+      //   },
+      //   error: function(data){
+      //     console.log(data);
+      //   }
+      // })
+
+      var formData = new FormData();
+      formData.append("data", blob);
+      // var name = $("input").val();
+      // formData.append("file", $("#upload")[0].files[0]);
+      // formData.append("name", name);
+      $.ajax({
+        url: 'http://api.shudong.wang/v1/file/upload-file', // 存储音频接口
+        // url: 'http://localhost:8000/v1/file/upload-file',
+        type: 'POST',
+        data: formData,
+        // 告诉jQuery不要去处理发送的数据
+        processData: false,
+        // 告诉jQuery不要去设置Content-Type请求头
+        contentType: false,
+        beforeSend: function () {
+          console.log("正在进行，请稍候");
+        },
+        success: function (responseStr) {
+          if (responseStr.status === 0) {
+            console.log("成功" + responseStr);
+          } else {
+            console.log("失败");
+          }
+        },
+        error: function (responseStr) {
+          console.log("error");
+        }
+      });
+      var li = document.createElement('li');
+      var au = document.createElement('audio');
+      var hf = document.createElement('a');
+      
+      au.controls = true;
+      au.src = url;
+      hf.href = url;
+      hf.download = new Date().toISOString() + '.mp3';
+      hf.innerHTML = hf.download;
+      li.appendChild(au);
+      li.appendChild(hf);
+      recordingslist.appendChild(li);
+    });
+  }
+
+  function errorHandler(params) {
+    __log('No live audio input: ' + params);
+  }
+
+  window.onload = function init() {
+    try {
+      // webkit shim
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ;
+      window.URL = window.URL || window.webkitURL;
+      
+      audio_context = new AudioContext;
+      __log('请设置Audio context .');
+      __log('navigator.getUserMedia ' + (navigator.getUserMedia ? '支持.' : '不支持！'));
+    } catch (e) {
+      alert('当前浏览器不支持音频功能');
+    }
+    // navigator.getUserMedia = navigator.getUserMedia ||
+    //   navigator.webkitGetUserMedia ||
+    //   navigator.mozGetUserMedia;
+
+    // navigator.mediaDevices.getUserMedia({ audio: true }, startUserMedia, function(e) {
+    //   __log('No live audio input: ' + e);
+    // });
+
+      navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(startUserMedia)
+      .catch(errorHandler)
+  };
+  </script>
+
+  <script src="../dist/recorder.js"></script>
+</body>
+</html>
