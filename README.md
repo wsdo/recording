@@ -138,7 +138,7 @@ recorder.exportAudio((blob) => {
 ```
 ### in react demo
 ```
-import recorder from 'recorder'
+import recorder from 'h5-recording'
 
 componentWillMount() {
     navigator.mediaDevices.getUserMedia({ audio: true })

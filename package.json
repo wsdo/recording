@@ -1,7 +1,7 @@
 {
-  "name": "recorder",
+  "name": "h5-recording",
   "version": "1.0.0",
-  "description": "Html5 recording solution, mp3 format",
+  "description": "解决h5录音方案 Html5 recording solution, mp3 format",
   "main": "lib/index.js",
   "scripts": {
     "build": "npm run build:lib && npm run build:browserify",
